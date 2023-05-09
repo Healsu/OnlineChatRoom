@@ -23,23 +23,21 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.Map;
 
+import adapter.CustomAdapter;
+import model.Messages;
+
 public class chatRoomActivity extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-
-
-
-
-
+    MainActivity main;
     String userName;
     EditText textMessage;
     TextView userNameShow;
-    private ListView chatBox;
-    private DatabaseReference mDatabase;
+    ListView chatBox;
+    ArrayAdapter<String> adapter;
+    ArrayList<Messages> mess = MainActivity.messages;
 
-    private ArrayList<String> mDataList = new ArrayList<>();
-    private ArrayAdapter<String> mAdapter;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -50,18 +48,12 @@ public class chatRoomActivity extends AppCompatActivity {
         userNameShow = findViewById(R.id.userNameShow);
         userName = getIntent().getStringExtra("userName");
         userNameShow.setText("Username: "+userName);
-
-
-        //Update listView automatically
-        /*
-        mDatabase = FirebaseDatabase.getInstance().getReference();
         chatBox = findViewById(R.id.listView);
-        mAdapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1, mDataList);
-        chatBox.setAdapter(mAdapter);
-         */
-
         textMessage = findViewById(R.id.chatInput);
+
+
         messageSend();
+        chatBoxUpdate();
 
 
     }
@@ -91,6 +83,7 @@ public class chatRoomActivity extends AppCompatActivity {
 
     //Update automatic the chatbox
     private void chatBoxUpdate(){
-        
+        main.makeList();
+        //adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,)
     }
 }
