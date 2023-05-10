@@ -22,13 +22,6 @@ import model.Messages;
 public class MainActivity extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
-    static ArrayList<Messages> messages = new ArrayList<>();
-    Timestamp timestamp;
-    String messName;
-    String messMessage;
-    Date messDate;
-
-
 
 
     String userName;
@@ -43,8 +36,8 @@ public class MainActivity extends AppCompatActivity {
 
 
         chatRoomClick();
-        makeList();
-        //getAndUpdateMessages();
+
+
     }
 
     private void chatRoomClick(){
@@ -65,39 +58,5 @@ public class MainActivity extends AppCompatActivity {
             }
         });
     }
-/*
-    private void getAndUpdateMessages(){
-        db.collection("messages");
-        QuerySnapshot queryDocumentSnapshots;
 
-        for (QueryDocumentSnapshot documentSnapshots: queryDocumentSnapshots){
-            messName = documentSnapshots.getString("name");
-            messMessage = documentSnapshots.getString("text");
-            messDate = documentSnapshots.getDate("timestamp");
-        }
-
-
-    }
-
- */
-
-    public void makeList(){
-        System.out.println("start called");
-        db.collection("messages").addSnapshotListener((snap,error) ->{
-            messages.clear();
-            for(DocumentSnapshot doc: snap.getDocuments()){
-
-                messName = doc.getString("name");
-                messMessage = doc.getString("text");
-                timestamp = doc.getTimestamp("timestamp");
-                messDate = timestamp.toDate();
-                Messages mess = new Messages(messName,messMessage,messDate);
-                messages.add(mess);
-            }
-            System.out.println(messages);
-
-
-            //mainActivity.adapter.notifyDataSetChanged(); // will make the adapter reload
-        });
-    }
 }

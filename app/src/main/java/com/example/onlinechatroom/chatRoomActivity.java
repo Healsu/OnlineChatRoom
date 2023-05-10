@@ -1,11 +1,14 @@
 package com.example.onlinechatroom;
 
 import androidx.appcompat.app.AppCompatActivity;
+
+import com.google.firebase.Timestamp;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
 import com.google.firebase.firestore.CollectionReference;
 import com.google.firebase.firestore.DocumentReference;
+import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.ktx.Firebase;
 import com.google.firebase.firestore.FirebaseFirestore;
@@ -20,6 +23,7 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
 
@@ -30,13 +34,20 @@ public class chatRoomActivity extends AppCompatActivity {
 
     FirebaseFirestore db = FirebaseFirestore.getInstance();
 
-    MainActivity main;
+
     String userName;
     EditText textMessage;
     TextView userNameShow;
     ListView chatBox;
-    ArrayAdapter<String> adapter;
-    ArrayList<Messages> mess = MainActivity.messages;
+    CustomAdapter customAdapter;
+
+
+
+    ArrayList<Messages> messages = new ArrayList<>();
+    Timestamp timestamp;
+    String messName;
+    String messMessage;
+    Date messDate;
 
 
     @Override
@@ -50,9 +61,9 @@ public class chatRoomActivity extends AppCompatActivity {
         userNameShow.setText("Username: "+userName);
         chatBox = findViewById(R.id.listView);
         textMessage = findViewById(R.id.chatInput);
-
-
         messageSend();
+        customAdapter = new CustomAdapter(chatRoomActivity.this,messages);
+        chatBox.setAdapter(customAdapter);
         chatBoxUpdate();
 
 
@@ -79,11 +90,33 @@ public class chatRoomActivity extends AppCompatActivity {
             }
         });
     }
+    public void makeList(){
+        System.out.println("start called");
+        db.collection("messages").addSnapshotListener((snap,error) ->{
+            messages.clear();
+            for(DocumentSnapshot doc: snap.getDocuments()){
+
+                messName = doc.getString("name");
+                messMessage = doc.getString("text");
+                timestamp = doc.getTimestamp("timestamp");
+                if (timestamp != null) {
+                    messDate = timestamp.toDate();} else {continue;}
+
+                Messages mess = new Messages(messName,messMessage,messDate);
+
+                messages.add(mess);
+            }
+            System.out.println(messages);
+
+
+        });
+    }
 
 
     //Update automatic the chatbox
     private void chatBoxUpdate(){
-        main.makeList();
-        //adapter = new ArrayAdapter<>(this, android.R.layout.simple_list_item_1,)
+       makeList();
+        customAdapter.notifyDataSetChanged();
+        chatBox.setAdapter(customAdapter);
     }
 }
