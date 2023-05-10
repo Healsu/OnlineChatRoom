@@ -26,7 +26,7 @@ public class CustomAdapter extends ArrayAdapter<Messages> {
 
     public View getView(int position, View convertView, ViewGroup parent) {
         if (convertView == null) {
-            convertView = inflater.inflate(R.layout.myrow, parent, false);
+            convertView = inflater.inflate(R.layout.myrow, null);
         }
 
         TextView itemTextView = convertView.findViewById(R.id.rowTextView);
@@ -35,8 +35,8 @@ public class CustomAdapter extends ArrayAdapter<Messages> {
         Messages customObject = getItem(position);
 
             itemTextView.setText(customObject.getMessName());
-            itemTextView2.setText(customObject.getMessMessage());// Replace getName() with the appropriate method to retrieve the desired attribute from your custom object
-        System.out.println(itemTextView);
+            itemTextView2.setText(customObject.getMessMessage());
+            System.out.println(itemTextView);
 
 
         return convertView;

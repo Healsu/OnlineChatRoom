@@ -107,7 +107,7 @@ public class chatRoomActivity extends AppCompatActivity {
                 messages.add(mess);
             }
             System.out.println(messages);
-
+            customAdapter.notifyDataSetChanged();
 
         });
     }
@@ -115,8 +115,9 @@ public class chatRoomActivity extends AppCompatActivity {
 
     //Update automatic the chatbox
     private void chatBoxUpdate(){
-       makeList();
-        customAdapter.notifyDataSetChanged();
-        chatBox.setAdapter(customAdapter);
+        makeList();
+
+        // Notify the adapter that the data has changed
+
     }
 }
