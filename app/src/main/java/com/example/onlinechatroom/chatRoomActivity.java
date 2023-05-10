@@ -42,7 +42,6 @@ public class chatRoomActivity extends AppCompatActivity {
     CustomAdapter customAdapter;
 
 
-
     ArrayList<Messages> messages = new ArrayList<>();
     Timestamp timestamp;
     String messName;
@@ -61,12 +60,12 @@ public class chatRoomActivity extends AppCompatActivity {
         userNameShow.setText("Username: "+userName);
         chatBox = findViewById(R.id.listView);
         textMessage = findViewById(R.id.chatInput);
-        messageSend();
+
         customAdapter = new CustomAdapter(chatRoomActivity.this,messages);
         chatBox.setAdapter(customAdapter);
         chatBoxUpdate();
 
-
+        messageSend();
     }
 
     //Sends message from chat site
@@ -90,7 +89,9 @@ public class chatRoomActivity extends AppCompatActivity {
             }
         });
     }
-    public void makeList(){
+
+
+    private void makeList(){
         System.out.println("start called");
         db.collection("messages").addSnapshotListener((snap,error) ->{
             messages.clear();
@@ -99,8 +100,7 @@ public class chatRoomActivity extends AppCompatActivity {
                 messName = doc.getString("name");
                 messMessage = doc.getString("text");
                 timestamp = doc.getTimestamp("timestamp");
-                if (timestamp != null) {
-                    messDate = timestamp.toDate();} else {continue;}
+
 
                 Messages mess = new Messages(messName,messMessage,messDate);
 
