@@ -23,6 +23,8 @@ import android.widget.ListView;
 import android.widget.TextView;
 
 import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Comparator;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
@@ -86,6 +88,7 @@ public class chatRoomActivity extends AppCompatActivity {
                 //Extra so we can order them by time for the actual message list
                 message.put("timestamp", FieldValue.serverTimestamp());
                 allMessages.add(message);
+                chatBoxUpdate();
             }
         });
     }
@@ -99,14 +102,20 @@ public class chatRoomActivity extends AppCompatActivity {
 
                 messName = doc.getString("name");
                 messMessage = doc.getString("text");
-                timestamp = doc.getTimestamp("timestamp");
-
+                //Timestamp is a bit of a fucky, so we have to check if it exist in the cloud storage fsr
+                if (doc.contains("timestamp") && doc.get("timestamp") instanceof com.google.firebase.Timestamp) {
+                    timestamp = doc.getTimestamp("timestamp");
+                    messDate = timestamp.toDate();
+                } else {
+                    System.out.println("TIMESTAMP COULDNT BE FOUND");
+                }
 
                 Messages mess = new Messages(messName,messMessage,messDate);
 
                 messages.add(mess);
             }
-            System.out.println(messages);
+            System.out.println("The Sorted list: "+messages);
+
             customAdapter.notifyDataSetChanged();
 
         });
