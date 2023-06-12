@@ -1,8 +1,13 @@
 package com.example.onlinechatroom;
 
+import androidx.annotation.NonNull;
+import androidx.annotation.Nullable;
 import androidx.appcompat.app.AppCompatActivity;
 
 import com.google.firebase.Timestamp;
+import com.google.firebase.database.ChildEventListener;
+import com.google.firebase.database.DataSnapshot;
+import com.google.firebase.database.DatabaseError;
 import com.google.firebase.database.DatabaseReference;
 import com.google.firebase.database.FirebaseDatabase;
 import com.google.firebase.database.ServerValue;
@@ -12,8 +17,10 @@ import com.google.firebase.firestore.DocumentSnapshot;
 import com.google.firebase.firestore.FieldValue;
 import com.google.firebase.ktx.Firebase;
 import com.google.firebase.firestore.FirebaseFirestore;
+import java.util.Comparator;
 
 
+import android.media.MediaPlayer;
 import android.os.Bundle;
 import android.view.View;
 import android.widget.ArrayAdapter;
@@ -66,8 +73,8 @@ public class chatRoomActivity extends AppCompatActivity {
         customAdapter = new CustomAdapter(chatRoomActivity.this,messages);
         chatBox.setAdapter(customAdapter);
         chatBoxUpdate();
-
         messageSend();
+        setupListener();
     }
 
     //Sends message from chat site
@@ -93,6 +100,12 @@ public class chatRoomActivity extends AppCompatActivity {
         });
     }
 
+    //Update automatic the chatbox
+    private void chatBoxUpdate(){
+        makeList();
+
+
+    }
 
     private void makeList(){
         System.out.println("start called");
@@ -114,6 +127,7 @@ public class chatRoomActivity extends AppCompatActivity {
 
                 messages.add(mess);
             }
+            Collections.sort(messages, new MessageComparator());
             System.out.println("The Sorted list: "+messages);
 
             customAdapter.notifyDataSetChanged();
@@ -121,12 +135,62 @@ public class chatRoomActivity extends AppCompatActivity {
         });
     }
 
-
-    //Update automatic the chatbox
-    private void chatBoxUpdate(){
-        makeList();
-
-        // Notify the adapter that the data has changed
-
+    public class MessageComparator implements Comparator<Messages> {
+        @Override
+        public int compare(Messages message1, Messages message2) {
+            return message1.getMessDate().compareTo(message2.getMessDate());
+        }
     }
+
+    private void setupListener(){
+        DatabaseReference messagesRef = FirebaseDatabase.getInstance().getReference("messages");
+
+        messagesRef.addChildEventListener(new ChildEventListener() {
+            @Override
+            public void onChildAdded(@NonNull DataSnapshot dataSnapshot, @Nullable String previousChildName) {
+
+                String messageText = dataSnapshot.child("text").getValue(String.class);
+                String senderName = dataSnapshot.child("name").getValue(String.class);
+                Timestamp senderTimestamp = dataSnapshot.child("timestamp").getValue(Timestamp.class);
+                Date senderDate = senderTimestamp.toDate();
+
+                Messages message = new Messages(senderName, messageText,senderDate);
+                messages.add(message);
+                soundMaker();
+                customAdapter.notifyDataSetChanged();
+
+            }
+            // Other methods of ChildEventListener (onChildChanged, onChildRemoved, onChildMoved, onCancelled)
+            // They could have been made into its own class, but im too far deep into this project to do so :(
+            @Override
+            public void onChildChanged(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onChildRemoved(@NonNull DataSnapshot snapshot) {
+
+            }
+
+            @Override
+            public void onChildMoved(@NonNull DataSnapshot snapshot, @Nullable String previousChildName) {
+
+            }
+
+            @Override
+            public void onCancelled(@NonNull DatabaseError error) {
+
+            }
+
+
+        });
+    }
+    private void soundMaker(){
+        System.out.println("playing sound");
+        MediaPlayer mediaPlayer = MediaPlayer.create(this,R.raw.ding);
+
+        mediaPlayer.start();
+    }
+
+
 }
